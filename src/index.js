@@ -9,6 +9,8 @@
 import React from 'react';
 import {StyleSheet, View, Text} from 'react-native';
 
+import './config/ReactotronConfig';
+
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const styles = StyleSheet.create({
