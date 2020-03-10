@@ -1,19 +1,19 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
+import 'react-native-gesture-handler';
+import './config/ReactotronConfig';
 import React from 'react';
 
-import './config/ReactotronConfig';
+import {NavigationContainer} from '@react-navigation/native';
 
 import Routes from './routes';
 
 const App = () => {
-  return <Routes />;
+  return (
+    <NavigationContainer>
+      <>
+        <Routes />
+      </>
+    </NavigationContainer>
+  );
 };
 
 export default App;
