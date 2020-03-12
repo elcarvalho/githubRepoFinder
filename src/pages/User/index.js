@@ -1,29 +1,65 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
-
-import api from '../../services/api';
 import PropTypes from 'prop-types';
 
-// import { Container } from './styles';
+import api from '../../services/api';
+
+import {
+  Container,
+  Header,
+  Avatar,
+  Name,
+  Bio,
+  Stars,
+  Starred,
+  OwnerAvatar,
+  Info,
+  Title,
+  Author,
+} from './styles';
 
 const User = ({route}) => {
-  const [starred, setStarred] = useState([]);
+  const [stars, setStars] = useState([]);
+  const [user, setUser] = useState({
+    name: '',
+    login: '',
+    bio: '',
+    avatar: '',
+  });
 
   useEffect(() => {
     const getGithubUser = async () => {
-      const {user} = route.params;
-      const response = await api.get(`/users/${user.login}/starred`);
+      const response = await api.get(
+        `/users/${route.params.user.login}/starred`
+      );
 
-      setStarred(response.data);
-      console.tron.log(response.data);
+      setStars(response.data);
+      setUser(route.params.user);
     };
 
     getGithubUser();
   }, []);
+
   return (
-    <View>
-      <Text>User</Text>
-    </View>
+    <Container>
+      <Header>
+        <Avatar source={{uri: user.avatar}} />
+        <Name>{user.name}</Name>
+        <Bio>{user.bio}</Bio>
+      </Header>
+
+      <Stars
+        data={stars}
+        keyExtractor={star => String(star.id)}
+        renderItem={({item}) => (
+          <Starred>
+            <OwnerAvatar source={{uri: item.owner.avatar_url}} />
+            <Info>
+              <Title>{item.name}</Title>
+              <Author>{item.owner.login}</Author>
+            </Info>
+          </Starred>
+        )}></Stars>
+    </Container>
   );
 };
 
