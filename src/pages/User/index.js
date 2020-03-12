@@ -58,7 +58,8 @@ const User = ({route}) => {
               <Author>{item.owner.login}</Author>
             </Info>
           </Starred>
-        )}></Stars>
+        )}
+      />
     </Container>
   );
 };
