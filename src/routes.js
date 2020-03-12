@@ -19,7 +19,11 @@ export default function Routes() {
         headerTintColor: '#FFF',
       }}>
       <Stack.Screen name="Main" component={Main} options={{title: 'Main'}} />
-      <Stack.Screen name="User" component={User} />
+      <Stack.Screen
+        name="User"
+        component={User}
+        options={({route}) => ({title: route.params.user.name})}
+      />
     </Stack.Navigator>
   );
 }
