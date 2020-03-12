@@ -19,12 +19,7 @@ import {
 
 const User = ({route}) => {
   const [stars, setStars] = useState([]);
-  const [user, setUser] = useState({
-    name: '',
-    login: '',
-    bio: '',
-    avatar: '',
-  });
+  const [user, setUser] = useState();
 
   useEffect(() => {
     const getGithubUser = async () => {
@@ -42,9 +37,9 @@ const User = ({route}) => {
   return (
     <Container>
       <Header>
-        <Avatar source={{uri: user.avatar}} />
-        <Name>{user.name}</Name>
-        <Bio>{user.bio}</Bio>
+        <Avatar source={user && {uri: user.avatar}} />
+        <Name>{user && user.name}</Name>
+        <Bio>{user && user.bio}</Bio>
       </Header>
 
       <Stars
