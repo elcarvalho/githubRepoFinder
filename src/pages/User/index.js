@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator} from 'react-native';
+import React, {useEffect, useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 
 import api from '../../services/api';
@@ -25,23 +24,19 @@ const User = ({route}) => {
   const [loading, setLoading] = useState(true);
   const [endOfList, setEndOfList] = useState(false);
 
-  useEffect(() => {
-    const getGithubUser = async () => {
-      try {
-        const response = await api.get(
-          `/users/${route.params.user.login}/starred`
-        );
+  const getStars = useCallback(async () => {
+    try {
+      const response = await api.get(
+        `/users/${route.params.user.login}/starred`
+      );
 
-        setStars(response.data);
-        setUser(route.params.user);
-      } catch (error) {
-        console.tron.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getGithubUser();
+      setStars(response.data);
+      setUser(route.params.user);
+    } catch (error) {
+      console.tron.log(error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const handleLoadMore = async () => {
@@ -70,6 +65,15 @@ const User = ({route}) => {
     }
   };
 
+  const handleRefreshList = () => {
+    setPage(1);
+    getStars();
+  };
+
+  useEffect(() => {
+    getStars();
+  }, []);
+
   return (
     <Container>
       <Header>
@@ -83,6 +87,8 @@ const User = ({route}) => {
         keyExtractor={star => String(star.id)}
         onEndReachedThrehold={0.2}
         onEndReached={handleLoadMore}
+        onRefresh={handleRefreshList}
+        refreshing={loading}
         renderItem={({item}) => (
           <Starred>
             <OwnerAvatar source={{uri: item.owner.avatar_url}} />
@@ -93,8 +99,6 @@ const User = ({route}) => {
           </Starred>
         )}
       />
-
-      {loading && <ActivityIndicator size="large" color="#7159c1" />}
     </Container>
   );
 };
