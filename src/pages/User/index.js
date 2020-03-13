@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {ActivityIndicator} from 'react-native';
 import PropTypes from 'prop-types';
 
 import api from '../../services/api';
@@ -20,15 +21,22 @@ import {
 const User = ({route}) => {
   const [stars, setStars] = useState([]);
   const [user, setUser] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getGithubUser = async () => {
-      const response = await api.get(
-        `/users/${route.params.user.login}/starred`
-      );
+      try {
+        const response = await api.get(
+          `/users/${route.params.user.login}/starred`
+        );
 
-      setStars(response.data);
-      setUser(route.params.user);
+        setStars(response.data);
+        setUser(route.params.user);
+      } catch (error) {
+        console.tron.log(error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getGithubUser();
@@ -41,20 +49,23 @@ const User = ({route}) => {
         <Name>{user && user.name}</Name>
         <Bio>{user && user.bio}</Bio>
       </Header>
-
-      <Stars
-        data={stars}
-        keyExtractor={star => String(star.id)}
-        renderItem={({item}) => (
-          <Starred>
-            <OwnerAvatar source={{uri: item.owner.avatar_url}} />
-            <Info>
-              <Title>{item.name}</Title>
-              <Author>{item.owner.login}</Author>
-            </Info>
-          </Starred>
-        )}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#7159c1" />
+      ) : (
+        <Stars
+          data={stars}
+          keyExtractor={star => String(star.id)}
+          renderItem={({item}) => (
+            <Starred>
+              <OwnerAvatar source={{uri: item.owner.avatar_url}} />
+              <Info>
+                <Title>{item.name}</Title>
+                <Author>{item.owner.login}</Author>
+              </Info>
+            </Starred>
+          )}
+        />
+      )}
     </Container>
   );
 };
