@@ -1,6 +1,8 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import PropTypes from 'prop-types';
 
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import api from '../../services/api';
 
 import {
@@ -15,9 +17,10 @@ import {
   Info,
   Title,
   Author,
+  OwnerButton,
 } from './styles';
 
-const User = ({route}) => {
+const User = ({route, navigation}) => {
   const [stars, setStars] = useState([]);
   const [user, setUser] = useState();
   const [page, setPage] = useState(1);
@@ -70,6 +73,10 @@ const User = ({route}) => {
     getStars();
   };
 
+  const handleShowDetails = (repository, name) => {
+    navigation.navigate('Details', {repository, name});
+  };
+
   useEffect(() => {
     getStars();
   }, []);
@@ -96,6 +103,10 @@ const User = ({route}) => {
               <Title>{item.name}</Title>
               <Author>{item.owner.login}</Author>
             </Info>
+            <OwnerButton
+              onPress={() => handleShowDetails(item.owner, item.name)}>
+              <Icon name="remove-red-eye" size={20} color="#fff" />
+            </OwnerButton>
           </Starred>
         )}
       />
@@ -113,6 +124,9 @@ User.propTypes = {
         avatar: PropTypes.string,
       }),
     }),
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func,
   }).isRequired,
 };
 
