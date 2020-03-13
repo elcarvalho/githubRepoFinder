@@ -21,7 +21,9 @@ import {
 const User = ({route}) => {
   const [stars, setStars] = useState([]);
   const [user, setUser] = useState();
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [endOfList, setEndOfList] = useState(false);
 
   useEffect(() => {
     const getGithubUser = async () => {
@@ -42,6 +44,32 @@ const User = ({route}) => {
     getGithubUser();
   }, []);
 
+  const handleLoadMore = async () => {
+    if (endOfList) return;
+
+    const newPage = page + 1;
+    setLoading(true);
+
+    try {
+      const response = await api.get(
+        `/users/${route.params.user.login}/starred?page=${newPage}`
+      );
+
+      const starred = response.data;
+
+      if (starred.length === 0) {
+        setEndOfList(true);
+      }
+
+      setStars([...stars, ...starred]);
+      setPage(newPage);
+    } catch (error) {
+      console.tron.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container>
       <Header>
@@ -49,23 +77,24 @@ const User = ({route}) => {
         <Name>{user && user.name}</Name>
         <Bio>{user && user.bio}</Bio>
       </Header>
-      {loading ? (
-        <ActivityIndicator size="large" color="#7159c1" />
-      ) : (
-        <Stars
-          data={stars}
-          keyExtractor={star => String(star.id)}
-          renderItem={({item}) => (
-            <Starred>
-              <OwnerAvatar source={{uri: item.owner.avatar_url}} />
-              <Info>
-                <Title>{item.name}</Title>
-                <Author>{item.owner.login}</Author>
-              </Info>
-            </Starred>
-          )}
-        />
-      )}
+
+      <Stars
+        data={stars}
+        keyExtractor={star => String(star.id)}
+        onEndReachedThrehold={0.2}
+        onEndReached={handleLoadMore}
+        renderItem={({item}) => (
+          <Starred>
+            <OwnerAvatar source={{uri: item.owner.avatar_url}} />
+            <Info>
+              <Title>{item.name}</Title>
+              <Author>{item.owner.login}</Author>
+            </Info>
+          </Starred>
+        )}
+      />
+
+      {loading && <ActivityIndicator size="large" color="#7159c1" />}
     </Container>
   );
 };
